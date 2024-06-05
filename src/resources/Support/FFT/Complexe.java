@@ -1,3 +1,5 @@
+package resources.Support.FFT;
+
 public interface Complexe
 {
 	public double reel();

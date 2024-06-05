@@ -1,3 +1,7 @@
+package resources.Support.FFT;
+
+import resources.Support.FFT.Complexe;
+
 public class ComplexePolaire implements Complexe
 {
 	private double mod;

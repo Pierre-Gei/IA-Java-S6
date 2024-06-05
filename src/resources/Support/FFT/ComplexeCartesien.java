@@ -1,3 +1,7 @@
+package resources.Support.FFT;
+
+import resources.Support.FFT.Complexe;
+
 public class ComplexeCartesien implements Complexe
 {
 	private double reel;
