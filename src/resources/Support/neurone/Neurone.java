@@ -1,3 +1,7 @@
+package resources.Support.neurone;
+
+import resources.Support.neurone.iNeurone;
+
 public abstract class Neurone implements iNeurone
 {
 	// Coefficient de mise à jour des poids,

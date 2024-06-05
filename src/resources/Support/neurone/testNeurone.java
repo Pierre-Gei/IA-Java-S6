@@ -1,3 +1,5 @@
+package resources.Support.neurone;
+
 public class testNeurone
 {
 	public static void main(String[] args)
