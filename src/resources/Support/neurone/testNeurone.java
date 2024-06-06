@@ -9,8 +9,8 @@ public class testNeurone
   final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
   final float[] resultats = {0, 0, 0, 1};
 
-  // final iNeurone n = new NeuroneSigmoid(entrees[0].length);
-   final iNeurone n = new NeuroneHeaviside(entrees[0].length);
+  final iNeurone n = new NeuroneSigmoid(entrees[0].length);
+   //final iNeurone n = new NeuroneHeaviside(entrees[0].length);
   // final iNeurone n = new Neurone(entrees[0].length);
   // final iNeurone n = new NeuroneReLu(entrees[0].length);
    //final iNeurone n = new NeuroneTanh(entrees[0].length);

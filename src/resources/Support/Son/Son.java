@@ -1,5 +1,7 @@
 package resources.Support.Son;
 
+import resources.Support.FFT.Complexe;
+
 import java.util.Arrays;
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -8,6 +10,9 @@ import java.nio.ByteOrder;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.AudioFormat;
+
+import resources.Support.FFT.ComplexeCartesien;
+
 
 
 // *****************************************************************************
