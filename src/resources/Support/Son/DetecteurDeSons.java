@@ -3,124 +3,226 @@ package resources.Support.Son;
 import resources.Support.FFT.ComplexeCartesien;
 import resources.Support.FFT.FFTCplx;
 import resources.Support.FFT.Complexe;
-import resources.Support.neurone.NeuroneHeaviside;
-import resources.Support.neurone.iNeurone;
+import resources.Support.neurone.*;
 
 public class DetecteurDeSons {
     public static void main(String[] args) {
         int sampleRate = 44100;
-        Complexe[] sinusoide = FFT("src/resources/Sources_sonores/Sinusoide.wav");
-        Complexe[] sinusoide2 = FFT("src/resources/Sources_sonores/Sinusoide2.wav");
-        Complexe[] sinusoide3Harmoniques = FFT("src/resources/Sources_sonores/Sinusoide3Harmoniques.wav");
-        Complexe[] bruit = FFT("src/resources/Sources_sonores/Bruit.wav");
-        Complexe[] carre = FFT("src/resources/Sources_sonores/Carre.wav");
-        Complexe[] combinaison = FFT("src/resources/Sources_sonores/Combinaison.wav");
+        float[][] FFTSinusoide = FFT("src/resources/Sources_sonores/Sinusoide.wav");
+        float[][] sinusoide = new float[2][FFTSinusoide[0].length];
+        for (int i = 0; i < FFTSinusoide[0].length; i++) {
+            sinusoide[0][i] = FFTSinusoide[0][i];
+            sinusoide[1][i] = FFTSinusoide[1][i];
+        }
+        float[][] FFTSinusoide2 = FFT("src/resources/Sources_sonores/Sinusoide2.wav");
+        float[][] sinusoide2 = new float[2][FFTSinusoide2[0].length];
+        for (int i = 0; i < FFTSinusoide2[0].length; i++) {
+            sinusoide2[0][i] = FFTSinusoide2[0][i];
+            sinusoide2[1][i] = FFTSinusoide2[1][i];
+        }
 
-        //train 1 neurone to trigger on sinusoide and not on Bruit or Carre
-        iNeurone neurone = new NeuroneHeaviside(sinusoide.length);
-        float[][] entrees = new float[][]{toMagnitudeArray(sinusoide), toMagnitudeArray(bruit), toMagnitudeArray(carre)};
-        float[] resultats = new float[]{1, 0, 0};
-        neurone.apprentissage(entrees, resultats);
+        float[][] FFTSinusoide3Harmoniques = FFT("src/resources/Sources_sonores/Sinusoide3Harmoniques.wav");
+        float[][] sinusoide3Harmoniques = new float[2][FFTSinusoide3Harmoniques[0].length];
+        for (int i = 0; i < FFTSinusoide3Harmoniques[0].length; i++) {
+            sinusoide3Harmoniques[0][i] = FFTSinusoide3Harmoniques[0][i];
+            sinusoide3Harmoniques[1][i] = FFTSinusoide3Harmoniques[1][i];
+        }
 
-        //train the neurone to also trigger on sinusoide2
-        float[][] entrees2 = new float[][]{toMagnitudeArray(sinusoide2), toMagnitudeArray(bruit), toMagnitudeArray(carre)};
-        float[] resultats2 = new float[]{1, 0, 0};
-        neurone.apprentissage(entrees2, resultats2);
+        float[][] FFTBruit = FFT("src/resources/Sources_sonores/Bruit.wav");
+        float[][] bruit = new float[2][FFTBruit[0].length];
+        for (int i = 0; i < FFTBruit[0].length; i++) {
+            bruit[0][i] = FFTBruit[0][i];
+            bruit[1][i] = FFTBruit[1][i];
+        }
 
-        //test if the neurone triggers on sinusoide and not on Bruit or Carre
-        float[] sinusoideMagnitude = toMagnitudeArray(sinusoide);
-        float[] sinusoide2Magnitude = toMagnitudeArray(sinusoide2);
-        float[] sinusoide3HarmoniquesMagnitude = toMagnitudeArray(sinusoide3Harmoniques);
-        float[] bruitMagnitude = toMagnitudeArray(bruit);
-        float[] carreMagnitude = toMagnitudeArray(carre);
+        float[][] FFTCarre = FFT("src/resources/Sources_sonores/Carre.wav");
+        float[][] carre = new float[2][FFTCarre[0].length];
+        for (int i = 0; i < FFTCarre[0].length; i++) {
+            carre[0][i] = FFTCarre[0][i];
+            carre[1][i] = FFTCarre[1][i];
+        }
+
+        float[][] FFTCombinaison = FFT("src/resources/Sources_sonores/Combinaison.wav");
+        float[][] combinaison = new float[2][FFTCombinaison[0].length];
+        for (int i = 0; i < FFTCombinaison[0].length; i++) {
+            combinaison[0][i] = FFTCombinaison[0][i];
+            combinaison[1][i] = FFTCombinaison[1][i];
+        }
+
+        // display the sinusoide table
+//        System.out.println("Sinusoide : ");
+//        for (int i = 0; i < sinusoide.length; i++) {
+//            System.out.print(sinusoide[i] + " ");
+//        }
+
+        iNeurone neuroneSinuoide = new NeuroneSigmoid(sinusoide[0].length);
+        iNeurone neuroneCarre = new NeuroneSigmoid(carre[0].length);
+
+        float[][] entrees = new float[][]{sinusoide[0], sinusoide[1], sinusoide2[0], sinusoide2[1], sinusoide3Harmoniques[0], sinusoide3Harmoniques[1], carre[0], carre[1]};
+        float[] resultats = new float[]{1, 1, 1, 1, 0, 0, 0, 0};
+
+
+        System.out.println("Apprentissage…");
+        System.out.println("Nombre de tours : " + neuroneSinuoide.apprentissage(entrees, resultats));
+
+        resultats = new float[]{0,0,0,0,0,0,1,1};
+        System.out.println("Nombre de tours : " + neuroneCarre.apprentissage(entrees, resultats));
+
+        //display number of synapses and bias for each neuron
+        Neurone vueNeuroneSinusoide = (Neurone) neuroneSinuoide;
+        System.out.println("Synapses Sinusoide : " + vueNeuroneSinusoide.synapses().length);
+        System.out.println("Biais Sinusoide : " + vueNeuroneSinusoide.biais());
+
+        //test the output of sinusoide neuron
         int echecs = 0;
-        for (int i = 0 ; i < 10; i++ ){
-            neurone.metAJour(sinusoideMagnitude);
-            System.out.println("Sinusoide: " + neurone.sortie());
-            if (neurone.sortie() != 1) {
-                echecs++;
-            }
-            neurone.metAJour(bruitMagnitude);
-            System.out.println("Bruit: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
-                echecs++;
-            }
-            neurone.metAJour(carreMagnitude);
-            System.out.println("Carre: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
+        for (int i = 0; i < 1000; i++) {
+            neuroneSinuoide.metAJour(sinusoide[0]);
+            if (neuroneSinuoide.sortie() < 0.5) {
                 echecs++;
             }
         }
-        System.out.println("Nombre d'échecs: " + echecs);
-        System.out.println("Nombre de réussites: " + (30 - echecs));
-        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
-        System.out.println("================================");
-        System.out.println("Test avec Sin2");
+        System.out.println("Nombre d'échecs pour la fonction Sinusoide : " + echecs);
+        float [] bruite = FFT("src/resources/Sources_sonores/SinusoideBruit.wav")[0];
         echecs = 0;
-        for (int i = 0 ; i < 10; i++ ){
-            neurone.metAJour(sinusoide2Magnitude);
-            System.out.println("Sinusoide2: " + neurone.sortie());
-            if (neurone.sortie() != 1) {
-                echecs++;
-            }
-            neurone.metAJour(bruitMagnitude);
-            System.out.println("Bruit: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
-                echecs++;
-            }
-            neurone.metAJour(carreMagnitude);
-            System.out.println("Carre: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
+        for (int i = 0; i < 1000; i++) {
+            neuroneSinuoide.metAJour(bruite);
+            if (neuroneSinuoide.sortie() < 0.5) {
                 echecs++;
             }
         }
-        System.out.println("Nombre d'échecs: " + echecs);
-        System.out.println("Nombre de réussites: " + (30 - echecs));
-        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
-        System.out.println("================================");
-        System.out.println("Test avec Sin3Harmoniques");
+        System.out.println("Nombre d'échecs pour la fonction Sinusoide bruité : " + echecs);
+
+        // test the output of carre neuron
+        Neurone vueNeuroneCarre = (Neurone) neuroneCarre;
+        System.out.println("Synapses Carre : " + vueNeuroneCarre.synapses().length);
+        System.out.println("Biais Carre : " + vueNeuroneCarre.biais());
         echecs = 0;
-        for (int i = 0 ; i < 10; i++ ){
-            neurone.metAJour(sinusoide3HarmoniquesMagnitude);
-            System.out.println("Sinusoide3Harmoniques: " + neurone.sortie());
-            if (neurone.sortie() != 1) {
-                echecs++;
-            }
-            neurone.metAJour(bruitMagnitude);
-            System.out.println("Bruit: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
-                echecs++;
-            }
-            neurone.metAJour(carreMagnitude);
-            System.out.println("Carre: " + neurone.sortie());
-            if (neurone.sortie() != 0) {
+        for (int i = 0; i < 1000; i++) {
+            neuroneCarre.metAJour(carre[0]);
+            if (neuroneCarre.sortie() < 0.5) {
                 echecs++;
             }
         }
-        System.out.println("Nombre d'échecs: " + echecs);
-        System.out.println("Nombre de réussites: " + (30 - echecs));
-        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
+        System.out.println("Nombre d'échecs pour la fonction Carre : " + echecs);
+        echecs = 0;
+        for (int i = 0; i < 1000; i++) {
+            neuroneCarre.metAJour(sinusoide2[0]);
+            if (neuroneCarre.sortie() < 0.5) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs pour la fonction Sin2 : " + echecs);
+
+        // test the output of the neuron with a combination of signals
+        echecs = 0;
+        for (int i = 0; i < 1000; i++) {
+            neuroneSinuoide.metAJour(combinaison[0]);
+            if (neuroneSinuoide.sortie() < 0.5) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs pour la fonction Combinaison : " + echecs);
+
+        // test the output of the neuron with a combination of signals
+        echecs = 0;
+        for (int i = 0; i < 1000; i++) {
+            neuroneCarre.metAJour(combinaison[0]);
+            if (neuroneCarre.sortie() < 0.5) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs pour la fonction Combinaison : " + echecs);
+
     }
 
-    public static Complexe[] FFT(String path) {
+    public static float[][] FFT(String path) {
         Son son = new Son(path);
-        int blockSize = 256; // Adjust this value as needed
-        for (int i = 0; i < son.donnees().length / blockSize; i++) {
+        int blockSize = 512;
+        int numBlocks = son.donnees().length / blockSize;
+        float[][] signal_complet_fft = new float[2][son.donnees().length];
+
+        // Find the maximum absolute value across all blocks
+        float maxVal = 0;
+        for (int i = 0; i < numBlocks; i++) {
             float[] audioBlock = son.bloc_deTaille(i, blockSize);
+            for (float val : audioBlock) {
+                maxVal = Math.max(maxVal, Math.abs(val));
+            }
+        }
+
+        // Normalize each block and apply FFT
+        for (int i = 0; i < numBlocks; i++) {
+            float[] audioBlock = son.bloc_deTaille(i, blockSize);
+
+            // Normalize the audio block
+            for (int j = 0; j < audioBlock.length; j++) {
+                audioBlock[j] /= maxVal;
+            }
+
             Complexe[] signal = new Complexe[audioBlock.length];
             for (int j = 0; j < audioBlock.length; j++) {
                 signal[j] = new ComplexeCartesien(audioBlock[j], 0);
             }
-            return FFTCplx.appliqueSur(signal);
+            Complexe[] signal_fft = FFTCplx.appliqueSur(signal);
+            for (int j = 0; j < blockSize; j++) {
+                signal_complet_fft[0][i * blockSize + j] = (float) signal_fft[j].mod();
+                signal_complet_fft[1][i * blockSize + j] = (float) signal_fft[j].arg();
+            }
         }
-        return null;
+//        System.out.println("Signal complet FFT : ");
+//        for (int i = 0; i < signal_complet_fft[0].length; i++) {
+//            System.out.print(signal_complet_fft[0][i] + " ");
+//        }
+        return signal_complet_fft;
     }
 
-    public static float[] toMagnitudeArray(Complexe[] complexArray) {
-        float[] magnitudeArray = new float[complexArray.length];
-        for (int i = 0; i < complexArray.length; i++) {
-            magnitudeArray[i] = (float) complexArray[i].mod();
+    public static float[][] FFT_Bruite(String Path, int Signal_noise_ratio){
+        Son son = new Son(Path);
+        Son noise = new Son("src/resources/Sources_sonores/Bruit.wav");
+        int blockSize = 512;
+        if (son.donnees().length != noise.donnees().length) {
+            throw new IllegalArgumentException("Audio data and noise must be the same length");
         }
-        return magnitudeArray;
+
+        // Add the noise to the audio data
+        float[] noisyAudioData = new float[son.donnees().length];
+        for (int i = 0; i < son.donnees().length; i++) {
+            noisyAudioData[i] = son.donnees()[i] + noise.donnees()[i]*(Signal_noise_ratio/100);
+        }
+
+        // Replace son.donnees() with noisyAudioData in the rest of the method
+        int numBlocks = noisyAudioData.length / blockSize;
+        float[][] signal_complet_fft = new float[2][noisyAudioData.length];
+
+        // Find the maximum absolute value across all blocks
+        float maxVal = 0;
+        for (int i = 0; i < numBlocks; i++) {
+            float[] audioBlock = son.bloc_deTaille(i, blockSize);
+            for (float val : audioBlock) {
+                maxVal = Math.max(maxVal, Math.abs(val));
+            }
+        }
+
+        // Normalize each block and apply FFT
+        for (int i = 0; i < numBlocks; i++) {
+            float[] audioBlock = son.bloc_deTaille(i, blockSize);
+
+            // Normalize the audio block
+            for (int j = 0; j < audioBlock.length; j++) {
+                audioBlock[j] /= maxVal;
+            }
+
+            Complexe[] signal = new Complexe[audioBlock.length];
+            for (int j = 0; j < audioBlock.length; j++) {
+                signal[j] = new ComplexeCartesien(audioBlock[j], 0);
+            }
+            Complexe[] signal_fft = FFTCplx.appliqueSur(signal);
+            for (int j = 0; j < blockSize; j++) {
+                signal_complet_fft[0][i * blockSize + j] = (float) signal_fft[j].mod();
+                signal_complet_fft[1][i * blockSize + j] = (float) signal_fft[j].arg();
+            }
+        }
+
+        return signal_complet_fft;
     }
 }
