@@ -7,7 +7,6 @@ import resources.Support.neurone.*;
 
 public class DetecteurDeSons {
     public static void main(String[] args) {
-        int sampleRate = 44100;
         float[][] FFTSinusoide = FFT("src/resources/Sources_sonores/Sinusoide.wav");
         float[][] sinusoide = new float[2][FFTSinusoide[0].length];
         for (int i = 0; i < FFTSinusoide[0].length; i++) {
@@ -49,7 +48,6 @@ public class DetecteurDeSons {
             combinaison[1][i] = FFTCombinaison[1][i];
         }
 
-        // display the sinusoide table
 //        System.out.println("Sinusoide : ");
 //        for (int i = 0; i < sinusoide.length; i++) {
 //            System.out.print(sinusoide[i] + " ");
@@ -92,7 +90,6 @@ public class DetecteurDeSons {
         }
         System.out.println("Nombre d'échecs pour la fonction Sinusoide bruité : " + echecs);
 
-        // test the output of carre neuron
         Neurone vueNeuroneCarre = (Neurone) neuroneCarre;
         System.out.println("Synapses Carre : " + vueNeuroneCarre.synapses().length);
         System.out.println("Biais Carre : " + vueNeuroneCarre.biais());
@@ -112,8 +109,6 @@ public class DetecteurDeSons {
             }
         }
         System.out.println("Nombre d'échecs pour la fonction Sin2 : " + echecs);
-
-        // test the output of the neuron with a combination of signals
         echecs = 0;
         for (int i = 0; i < 1000; i++) {
             neuroneSinuoide.metAJour(combinaison[0]);
@@ -122,8 +117,6 @@ public class DetecteurDeSons {
             }
         }
         System.out.println("Nombre d'échecs pour la fonction Combinaison : " + echecs);
-
-        // test the output of the neuron with a combination of signals
         echecs = 0;
         for (int i = 0; i < 1000; i++) {
             neuroneCarre.metAJour(combinaison[0]);
@@ -132,7 +125,6 @@ public class DetecteurDeSons {
             }
         }
         System.out.println("Nombre d'échecs pour la fonction Combinaison : " + echecs);
-
     }
 
     public static float[][] FFT(String path) {
@@ -140,8 +132,6 @@ public class DetecteurDeSons {
         int blockSize = 512;
         int numBlocks = son.donnees().length / blockSize;
         float[][] signal_complet_fft = new float[2][son.donnees().length];
-
-        // Find the maximum absolute value across all blocks
         float maxVal = 0;
         for (int i = 0; i < numBlocks; i++) {
             float[] audioBlock = son.bloc_deTaille(i, blockSize);
@@ -149,12 +139,8 @@ public class DetecteurDeSons {
                 maxVal = Math.max(maxVal, Math.abs(val));
             }
         }
-
-        // Normalize each block and apply FFT
         for (int i = 0; i < numBlocks; i++) {
             float[] audioBlock = son.bloc_deTaille(i, blockSize);
-
-            // Normalize the audio block
             for (int j = 0; j < audioBlock.length; j++) {
                 audioBlock[j] /= maxVal;
             }
@@ -176,53 +162,42 @@ public class DetecteurDeSons {
         return signal_complet_fft;
     }
 
-    public static float[][] FFT_Bruite(String Path, int Signal_noise_ratio){
-        Son son = new Son(Path);
-        Son noise = new Son("src/resources/Sources_sonores/Bruit.wav");
-        int blockSize = 512;
-        if (son.donnees().length != noise.donnees().length) {
-            throw new IllegalArgumentException("Audio data and noise must be the same length");
-        }
-
-        // Add the noise to the audio data
-        float[] noisyAudioData = new float[son.donnees().length];
-        for (int i = 0; i < son.donnees().length; i++) {
-            noisyAudioData[i] = son.donnees()[i] + noise.donnees()[i]*(Signal_noise_ratio/100);
-        }
-
-        // Replace son.donnees() with noisyAudioData in the rest of the method
-        int numBlocks = noisyAudioData.length / blockSize;
-        float[][] signal_complet_fft = new float[2][noisyAudioData.length];
-
-        // Find the maximum absolute value across all blocks
-        float maxVal = 0;
-        for (int i = 0; i < numBlocks; i++) {
-            float[] audioBlock = son.bloc_deTaille(i, blockSize);
-            for (float val : audioBlock) {
-                maxVal = Math.max(maxVal, Math.abs(val));
-            }
-        }
-
-        // Normalize each block and apply FFT
-        for (int i = 0; i < numBlocks; i++) {
-            float[] audioBlock = son.bloc_deTaille(i, blockSize);
-
-            // Normalize the audio block
-            for (int j = 0; j < audioBlock.length; j++) {
-                audioBlock[j] /= maxVal;
-            }
-
-            Complexe[] signal = new Complexe[audioBlock.length];
-            for (int j = 0; j < audioBlock.length; j++) {
-                signal[j] = new ComplexeCartesien(audioBlock[j], 0);
-            }
-            Complexe[] signal_fft = FFTCplx.appliqueSur(signal);
-            for (int j = 0; j < blockSize; j++) {
-                signal_complet_fft[0][i * blockSize + j] = (float) signal_fft[j].mod();
-                signal_complet_fft[1][i * blockSize + j] = (float) signal_fft[j].arg();
-            }
-        }
-
-        return signal_complet_fft;
-    }
+//    public static float[][] FFT_Bruite(String Path, int Signal_noise_ratio){
+//        Son son = new Son(Path);
+//        Son noise = new Son("src/resources/Sources_sonores/Bruit.wav");
+//        int blockSize = 512;
+//        if (son.donnees().length != noise.donnees().length) {
+//            throw new IllegalArgumentException("Audio data and noise must be the same length");
+//        }
+//        float[] noisyAudioData = new float[son.donnees().length];
+//        for (int i = 0; i < son.donnees().length; i++) {
+//            noisyAudioData[i] = son.donnees()[i] + noise.donnees()[i]*(Signal_noise_ratio/100);
+//        }
+//        int numBlocks = noisyAudioData.length / blockSize;
+//        float[][] signal_complet_fft = new float[2][noisyAudioData.length];
+//        float maxVal = 0;
+//        for (int i = 0; i < numBlocks; i++) {
+//            float[] audioBlock = son.bloc_deTaille(i, blockSize);
+//            for (float val : audioBlock) {
+//                maxVal = Math.max(maxVal, Math.abs(val));
+//            }
+//        }
+//        for (int i = 0; i < numBlocks; i++) {
+//            float[] audioBlock = son.bloc_deTaille(i, blockSize);
+//            for (int j = 0; j < audioBlock.length; j++) {
+//                audioBlock[j] /= maxVal;
+//            }
+//            Complexe[] signal = new Complexe[audioBlock.length];
+//            for (int j = 0; j < audioBlock.length; j++) {
+//                signal[j] = new ComplexeCartesien(audioBlock[j], 0);
+//            }
+//            Complexe[] signal_fft = FFTCplx.appliqueSur(signal);
+//            for (int j = 0; j < blockSize; j++) {
+//                signal_complet_fft[0][i * blockSize + j] = (float) signal_fft[j].mod();
+//                signal_complet_fft[1][i * blockSize + j] = (float) signal_fft[j].arg();
+//            }
+//        }
+//
+//        return signal_complet_fft;
+//    }
 }
