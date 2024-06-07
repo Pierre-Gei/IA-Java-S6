@@ -34,19 +34,10 @@ public class testNeurone
 
   statistiquesPoids(vueNeurone);
   ajouterBruit(vueNeurone, 0.1f);
-  System.out.println("Apprentissage…");
-  System.out.println("Nombre de tours : "+n.apprentissage(entrees, resultats));
-  System.out.print("Synapses : ");
   for (final float f : vueNeurone.synapses())
    System.out.print(f+" ");
   System.out.print("\nBiais : ");
   System.out.println(vueNeurone.biais());
-  for (int i = 0; i < entrees.length; ++i)
-  {
-   final float[] entree = entrees[i];
-   n.metAJour(entree);
-   System.out.println("Entree "+i+" : "+n.sortie());
-  }
   statistiquesPoids(vueNeurone);
  }
 

@@ -8,100 +8,119 @@ import resources.Support.neurone.iNeurone;
 
 public class DetecteurDeSons {
     public static void main(String[] args) {
-        int sampleRate = 44100; // Adjust this value as needed
-        int targetFrequencyHz = 200;
-                // 1. Lecture du fichier son
-                        Son son = new Son("src/resources/Sources_sonores/Sinusoide.wav");
-                // 2. Apply the FFT to each block of audio data
-                int blockSize = 256; // Adjust this value as needed
-                for (int i = 0; i < son.donnees().length / blockSize; i++) {
-                    float[] audioBlock = son.bloc_deTaille(i, blockSize);
-                    Complexe[] signal = new Complexe[audioBlock.length];
-                    for (int j = 0; j < audioBlock.length; j++) {
-                        signal[j] = new ComplexeCartesien(audioBlock[j], 0);
-                    }
-                    Complexe[] frequencyComponents = FFTCplx.appliqueSur(signal);
+        int sampleRate = 44100;
+        Complexe[] sinusoide = FFT("src/resources/Sources_sonores/Sinusoide.wav");
+        Complexe[] sinusoide2 = FFT("src/resources/Sources_sonores/Sinusoide2.wav");
+        Complexe[] sinusoide3Harmoniques = FFT("src/resources/Sources_sonores/Sinusoide3Harmoniques.wav");
+        Complexe[] bruit = FFT("src/resources/Sources_sonores/Bruit.wav");
+        Complexe[] carre = FFT("src/resources/Sources_sonores/Carre.wav");
+        Complexe[] combinaison = FFT("src/resources/Sources_sonores/Combinaison.wav");
 
-                }
-                float[] outputs = new float[son.donnees().length / blockSize];
+        //train 1 neurone to trigger on sinusoide and not on Bruit or Carre
+        iNeurone neurone = new NeuroneHeaviside(sinusoide.length);
+        float[][] entrees = new float[][]{toMagnitudeArray(sinusoide), toMagnitudeArray(bruit), toMagnitudeArray(carre)};
+        float[] resultats = new float[]{1, 0, 0};
+        neurone.apprentissage(entrees, resultats);
 
-                //get the main frequency component of the signal
+        //train the neurone to also trigger on sinusoide2
+        float[][] entrees2 = new float[][]{toMagnitudeArray(sinusoide2), toMagnitudeArray(bruit), toMagnitudeArray(carre)};
+        float[] resultats2 = new float[]{1, 0, 0};
+        neurone.apprentissage(entrees2, resultats2);
 
+        //test if the neurone triggers on sinusoide and not on Bruit or Carre
+        float[] sinusoideMagnitude = toMagnitudeArray(sinusoide);
+        float[] sinusoide2Magnitude = toMagnitudeArray(sinusoide2);
+        float[] sinusoide3HarmoniquesMagnitude = toMagnitudeArray(sinusoide3Harmoniques);
+        float[] bruitMagnitude = toMagnitudeArray(bruit);
+        float[] carreMagnitude = toMagnitudeArray(carre);
+        int echecs = 0;
+        for (int i = 0 ; i < 10; i++ ){
+            neurone.metAJour(sinusoideMagnitude);
+            System.out.println("Sinusoide: " + neurone.sortie());
+            if (neurone.sortie() != 1) {
+                echecs++;
+            }
+            neurone.metAJour(bruitMagnitude);
+            System.out.println("Bruit: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+            neurone.metAJour(carreMagnitude);
+            System.out.println("Carre: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs: " + echecs);
+        System.out.println("Nombre de réussites: " + (30 - echecs));
+        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
+        System.out.println("================================");
+        System.out.println("Test avec Sin2");
+        echecs = 0;
+        for (int i = 0 ; i < 10; i++ ){
+            neurone.metAJour(sinusoide2Magnitude);
+            System.out.println("Sinusoide2: " + neurone.sortie());
+            if (neurone.sortie() != 1) {
+                echecs++;
+            }
+            neurone.metAJour(bruitMagnitude);
+            System.out.println("Bruit: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+            neurone.metAJour(carreMagnitude);
+            System.out.println("Carre: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs: " + echecs);
+        System.out.println("Nombre de réussites: " + (30 - echecs));
+        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
+        System.out.println("================================");
+        System.out.println("Test avec Sin3Harmoniques");
+        echecs = 0;
+        for (int i = 0 ; i < 10; i++ ){
+            neurone.metAJour(sinusoide3HarmoniquesMagnitude);
+            System.out.println("Sinusoide3Harmoniques: " + neurone.sortie());
+            if (neurone.sortie() != 1) {
+                echecs++;
+            }
+            neurone.metAJour(bruitMagnitude);
+            System.out.println("Bruit: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+            neurone.metAJour(carreMagnitude);
+            System.out.println("Carre: " + neurone.sortie());
+            if (neurone.sortie() != 0) {
+                echecs++;
+            }
+        }
+        System.out.println("Nombre d'échecs: " + echecs);
+        System.out.println("Nombre de réussites: " + (30 - echecs));
+        System.out.println("Taux de réussite: " + (30 - echecs) / 30.0);
+    }
 
-        // 3. Use the frequency components to detect the presence of a specific waveform (e.g., a sine wave) at a target frequency
-        int targetFrequencyIndex = targetFrequencyHz * blockSize / sampleRate;
-        float threshold = 0.1f; // Adjust this value as needed
+    public static Complexe[] FFT(String path) {
+        Son son = new Son(path);
+        int blockSize = 256; // Adjust this value as needed
         for (int i = 0; i < son.donnees().length / blockSize; i++) {
             float[] audioBlock = son.bloc_deTaille(i, blockSize);
             Complexe[] signal = new Complexe[audioBlock.length];
             for (int j = 0; j < audioBlock.length; j++) {
                 signal[j] = new ComplexeCartesien(audioBlock[j], 0);
             }
-            Complexe[] frequencyComponents = FFTCplx.appliqueSur(signal);
-
-            // Set the desired output for the neuron based on the presence of the target frequency
-            outputs[i] = frequencyComponents[targetFrequencyIndex].mod() > threshold ? 1.0f : 0.0f;
+            return FFTCplx.appliqueSur(signal);
         }
+        return null;
+    }
 
-        // 4. Use a perceptron to classify the audio data based on the detected frequency components
-        iNeurone neuron = new NeuroneHeaviside(blockSize); // Adjust this as needed
-        float[][] inputs = new float[son.donnees().length / blockSize][blockSize];
-        for (int i = 0; i < son.donnees().length / blockSize; i++) {
-            float[] audioBlock = son.bloc_deTaille(i, blockSize);
-            Complexe[] signal = new Complexe[audioBlock.length];
-            for (int j = 0; j < audioBlock.length; j++) {
-                signal[j] = new ComplexeCartesien(audioBlock[j], 0);
-            }
-            Complexe[] frequencyComponents = FFTCplx.appliqueSur(signal);
-
-            // Convert the frequency components to inputs for the neuron
-            for (int j = 0; j < blockSize; j++) {
-                inputs[i][j] = (float) frequencyComponents[j].mod();
-            }
-
-            // Set the desired output for the neuron
-            outputs[i] = frequencyComponents[targetFrequencyIndex].mod() > threshold ? 1.0f : 0.0f;
+    public static float[] toMagnitudeArray(Complexe[] complexArray) {
+        float[] magnitudeArray = new float[complexArray.length];
+        for (int i = 0; i < complexArray.length; i++) {
+            magnitudeArray[i] = (float) complexArray[i].mod();
         }
-
-        // Train the neuron with the inputs and outputs
-        neuron.apprentissage(inputs, outputs);
-
-        // 5. Use the neuron to classify new audio data
-        int count = 0;
-        Son newAudioData = new Son("src/resources/Sources_sonores/Bruit.wav");
-        for (int i = 0; i < newAudioData.donnees().length / blockSize; i++) {
-            float[] audioBlock = newAudioData.bloc_deTaille(i, blockSize);
-            Complexe[] signal = new Complexe[audioBlock.length];
-            for (int j = 0; j < audioBlock.length; j++) {
-                signal[j] = new ComplexeCartesien(audioBlock[j], 0);
-            }
-            Complexe[] frequencyComponents = FFTCplx.appliqueSur(signal);
-
-            // Convert the frequency components to inputs for the neuron
-            float[] inputs2 = new float[blockSize];
-            for (int j = 0; j < blockSize; j++) {
-                inputs2[j] = (float) frequencyComponents[j].mod();
-            }
-
-            // Use the neuron to classify the inputs
-            neuron.metAJour(inputs2);
-            float output = neuron.sortie();
-
-            // Output the classification result
-            System.out.println("Output for block " + i + ": " + output);
-
-            // Analyze the output to determine if the trained waveform is present in the new audio data block (by making a decision based on the output value ratio)
-            if (output > 0.5) {
-                count++;
-            }
-        }
-        // Analyze the classification results
-        float detectionRatio = (float) count / (newAudioData.donnees().length / blockSize);
-        boolean waveformDetected = detectionRatio > 0.5; // Adjust this threshold as needed
-
-        // Output the final decision
-        System.out.println("Detection ratio: " + detectionRatio);
-        System.out.println("Trained waveform detected: " + waveformDetected);
-
+        return magnitudeArray;
     }
 }
