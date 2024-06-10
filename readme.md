@@ -40,7 +40,29 @@ Vous pouvez lancer le fichier `projet.bat` (sous Windows) situé a la racine du 
 ```bash
 projet.bat
 ```
-Vous pouvez aussi exécuter le fichier `DetecteurDeSons.java` situé a `src/DetecteurDeSons.java` dans votre IDE Java préféré après avoir compilé le projet :
+Cela compilera tous les fichiers Java nécessaires et exécutera le programme principal `DetecteurDeSons.java`.
+Vous pouvez aussi exécuter le fichier `DetecteurDeSons.java` situé a `src/DetecteurDeSons.java` dans votre IDE Java préféré après avoir compilé le projet.
+
+Voici un exemple de ce à quoi pourrait ressembler le menu qui s'affiche une fois l'apprentissage du reseau de neurones terminé :
+
+```
+======================================================================
+Bienvenue dans le détecteur de sons
+Quel son voulez-vous analyser ?
+1. Sinusoide
+2. Sinusoide2
+3. Sinusoide3Harmoniques
+4. Bruit
+5. Carre
+6. Combinaison
+7. SinusoideBruit
+8. Sinusoide 100Hz
+9. Carré bruité 200Hz
+0. Quitter
+   Choix :
+```
+Entrez simplement le numéro de l'option que vous souhaitez et le programme analysera le son correspondant.  
+Notez que ce programme nécessite que Java soit installé sur votre machine et que le chemin d'accès à l'exécutable Java soit correctement configuré dans votre variable d'environnement PATH.
 
 ## Chronologie du Projet
 
