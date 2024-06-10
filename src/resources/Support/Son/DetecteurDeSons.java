@@ -30,7 +30,7 @@ public class DetecteurDeSons {
 
         System.out.println("Apprentissage général…");
 
-        int dataset_size = 40;
+        int dataset_size = 20;
         float[][] entrees_sin = new float[dataset_size][];
         float[] sortie_sin = new float[dataset_size];
         for (int i = 0; i < (dataset_size) / 4; i++) {
@@ -82,6 +82,9 @@ public class DetecteurDeSons {
         Scanner scanner = new Scanner(System.in);
         int choix = 1;
         do {
+            System.out.println("======================================================================");
+            System.out.println("Bienvenue dans le détecteur de sons");
+            System.out.println("Quel son voulez-vous analyser ?");
             System.out.println("1. Sinusoide");
             System.out.println("2. Sinusoide2");
             System.out.println("3. Sinusoide3Harmoniques");
@@ -146,7 +149,8 @@ public class DetecteurDeSons {
         }
         moyenneSortiesSin /= nombreNeurones / 2;
         moyenneSortiesCarre /= nombreNeurones / 2;
-        System.out.println("Moyenne des sorties : \nSinusoide : " + moyenneSortiesSin + "\nCarré : " + moyenneSortiesCarre);
+        System.out.println("Moyenne des sorties : \nNeurones specialisés en Sinusoides : " + moyenneSortiesSin + "\nNeurones specialisés en Carrés : " + moyenneSortiesCarre);
+        System.out.print("\033[31m");
         if (moyenneSortiesSin > 0.5 && moyenneSortiesCarre > 0.5) {
             System.out.println("C'est une combinaison");
         } else if (moyenneSortiesSin > 0.5) {
@@ -162,6 +166,7 @@ public class DetecteurDeSons {
                 System.out.println("Il est plus probable que ce soit un carre");
             }
         }
+        System.out.print("\033[0m");
     }
 
     public static float[] FFT(float[] input) {
