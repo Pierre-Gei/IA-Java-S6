@@ -1,8 +1,7 @@
-package resources.Support.Son;
-
 import resources.Support.FFT.ComplexeCartesien;
 import resources.Support.FFT.FFTCplx;
 import resources.Support.FFT.Complexe;
+import resources.Support.Son.Son;
 import resources.Support.neurone.*;
 
 import java.util.Scanner;
