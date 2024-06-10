@@ -5,6 +5,8 @@ import java.util.Random;
 
 public class testNeurone {
     public static void main(String[] args) {
+        //Selon votre choix de fonction logique, décommentez les lignes correspondantes et commentez les autres
+
         // Définition des entrées et des résultats attendus pour la fonction OU
         final float[][] entrees = {{0, 0}, {0, 1}, {1, 0}, {1, 1}};
         final float[] resultats = {0, 1, 1, 1};

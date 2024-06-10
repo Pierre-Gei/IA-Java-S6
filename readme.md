@@ -34,7 +34,7 @@ Pour installer le projet, vous pouvez cloner le dépôt Git sur votre machine lo
 git clone https://github.com/Pierre-Gei/IA-Java-S6.git
 ```
 
-## Lancement et Utilisation
+## Lancement et Utilisation du détecteur de sons
 
 Vous pouvez lancer le fichier `projet.bat` (sous Windows) situé a la racine du projet pour lancer le projet.
 ```bash
@@ -63,6 +63,19 @@ Quel son voulez-vous analyser ?
 ```
 Entrez simplement le numéro de l'option que vous souhaitez et le programme analysera le son correspondant.  
 Notez que ce programme nécessite que Java soit installé sur votre machine et que le chemin d'accès à l'exécutable Java soit correctement configuré dans votre variable d'environnement PATH.
+
+## Lancement et Utilisation des Tests
+
+Vous pouvez lancer le fichier `test.bat` (sous Windows) situé a la racine du projet pour lancer les tests.
+```bash
+testNeurone.bat
+```
+Cela compilera tous les fichiers Java nécessaires et exécutera le programme de test `TestNeurone.java`.
+Vous pouvez aussi exécuter le fichier `TestNeurone.java` situé a `src/ressources/Support/neurone/testNeurone` dans votre IDE Java préféré après avoir compilé le projet.
+
+### Remarque
+
+Pour changer les entrées et le type de neurone, vous pouvez modifier les paramètres dans le fichier `TestNeurone.java` avant de l'exécuter.
 
 ## Chronologie du Projet
 
